@@ -44,7 +44,13 @@ class _BaseOptionsDescriptor:
         self.name = name
 
     def __get__(self, obj, cls):
-        if self.name in ("acceptInsecureCerts", "strictFileInteractability", "setWindowRect", "se:downloadsEnabled"):
+        if self.name in (
+            "acceptInsecureCerts",
+            "strictFileInteractability",
+            "setWindowRect",
+            "se:downloadsEnabled",
+            "webSocketUrl",
+        ):
             return obj._caps.get(self.name, False)
         return obj._caps.get(self.name)
 
@@ -348,6 +354,28 @@ class BaseOptions(metaclass=ABCMeta):
         - `self.enable_downloads`
     - Set
         - `self.enable_downloads` = `value`
+
+    Parameters
+    ----------
+    `value`: `bool`
+
+    Returns
+    -------
+    - Get
+        - `bool`
+    - Set
+        - `None`
+    """
+
+    web_socket_url = _BaseOptionsDescriptor("webSocketUrl")
+    """Gets and Sets WebSocket URL.
+
+    Usage
+    -----
+    - Get
+        - `self.web_socket_url`
+    - Set
+        - `self.web_socket_url` = `value`
 
     Parameters
     ----------

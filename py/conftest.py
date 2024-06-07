@@ -79,6 +79,14 @@ def pytest_addoption(parser):
         dest="use_lan_ip",
         help="Whether to start test server with lan ip instead of localhost",
     )
+    parser.addoption(
+        "--bidi",
+        action="store",
+        dest="bidi",
+        metavar="BIDI",
+        default=True,
+        help="Whether to enable BiDi support",
+    )
 
 
 def pytest_ignore_collect(path, config):
@@ -166,6 +174,7 @@ def get_options(driver_class, config):
     browser_path = config.option.binary
     browser_args = config.option.args
     headless = bool(config.option.headless)
+    bidi = bool(config.option.bidi)
     options = None
 
     if browser_path or browser_args:
@@ -187,6 +196,14 @@ def get_options(driver_class, config):
             options.add_argument("--headless=new")
         if driver_class == "Firefox":
             options.add_argument("-headless")
+
+    if bidi:
+        if not options:
+            options = getattr(webdriver, f"{driver_class}Options")()
+
+        if driver_class == "Chrome" or driver_class == "Edge" or driver_class == "Firefox":
+            options.web_socket_url = True
+
     return options
 
 
