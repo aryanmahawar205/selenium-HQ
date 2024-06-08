@@ -84,7 +84,6 @@ def pytest_addoption(parser):
         action="store",
         dest="bidi",
         metavar="BIDI",
-        default=True,
         help="Whether to enable BiDi support",
     )
 
