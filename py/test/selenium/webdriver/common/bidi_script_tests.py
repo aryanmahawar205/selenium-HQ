@@ -22,8 +22,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 @pytest.mark.xfail_safari
 def test_logs_console_messages(driver, pages):
-    log_entries = []
     pages.load("bidi/LogEntryAdded.html")
+
+    log_entries = []
     driver.script.add_console_message_handler(log_entries.append)
 
     driver.find_element(By.ID, "jsException").click()
@@ -39,9 +40,35 @@ def test_logs_console_messages(driver, pages):
 
 
 @pytest.mark.xfail_safari
-def test_logs_multiple_console_messages(driver, pages):
-    log_entries = []
+def test_logs_console_errors(driver, pages):
     pages.load("bidi/LogEntryAdded.html")
+
+    log_entries = []
+    def log_error(entry):
+        if entry.level == "error":
+            log_entries.append(entry)
+
+    driver.script.add_console_message_handler(log_error)
+
+    driver.find_element(By.ID, "consoleLog").click()
+    driver.find_element(By.ID, "consoleError").click()
+
+    WebDriverWait(driver, 5).until(lambda _: log_entries)
+
+    assert len(log_entries) == 1
+
+    log_entry = log_entries[0]
+    assert log_entry.level == "error"
+    assert log_entry.method == "error"
+    assert log_entry.text == "I am console error"
+    assert log_entry.type_ == "console"
+
+
+@pytest.mark.xfail_safari
+def test_logs_multiple_console_messages(driver, pages):
+    pages.load("bidi/LogEntryAdded.html")
+
+    log_entries = []
     driver.script.add_console_message_handler(log_entries.append)
     driver.script.add_console_message_handler(log_entries.append)
 
@@ -54,9 +81,10 @@ def test_logs_multiple_console_messages(driver, pages):
 
 @pytest.mark.xfail_safari
 def test_removes_console_message_handler(driver, pages):
+    pages.load("bidi/LogEntryAdded.html")
+
     log_entries1 = []
     log_entries2 = []
-    pages.load("bidi/LogEntryAdded.html")
 
     id = driver.script.add_console_message_handler(log_entries1.append)
     driver.script.add_console_message_handler(log_entries2.append)
