@@ -200,8 +200,7 @@ def get_options(driver_class, config):
         if not options:
             options = getattr(webdriver, f"{driver_class}Options")()
 
-        if driver_class == "Chrome" or driver_class == "Edge" or driver_class == "Firefox":
-            options.web_socket_url = True
+        options.web_socket_url = True
 
     return options
 
